@@ -21,6 +21,9 @@ project(
     DESCRIPTION "The EPANET Program for Water Distribution System Analysis"
 )
 
+set (LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+set (EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+
 add_compile_definitions(
     $<$<CXX_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>
     $<$<CXX_COMPILER_ID:MSVC>:_SCL_SECURE_NO_WARNINGS>
