@@ -21,6 +21,11 @@ project(
     DESCRIPTION "The EPANET Program for Water Distribution System Analysis"
 )
 
+add_compile_definitions(
+    $<$<CXX_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>
+    $<$<CXX_COMPILER_ID:MSVC>:_SCL_SECURE_NO_WARNINGS>
+)
+
 # Append local dir to module search path
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
