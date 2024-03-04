@@ -316,7 +316,7 @@ double pipereact(Project *pr, int k, double c, double v, long dt)
 
     // Otherwise find bulk & wall reaction rates
     /*Modifs V. Harcouet 26-08-2011*/
-    double c1 = max(0.0, fabs(cwall-c));
+    double c1 = fmax(0.0, fabs(cwall-c));
 	double c2= cwall-c;
 
 	/* Compute concentration potential */
