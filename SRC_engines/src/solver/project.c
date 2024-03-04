@@ -309,14 +309,16 @@ int allocdata(Project *pr)
     if (!errcode)
     {
         n = pr->parser.MaxNodes + 1;
-        pr->network.Node       = (Snode *)calloc(n, sizeof(Snode));
-        pr->hydraul.NodeDemand = (double *)calloc(n, sizeof(double));
-        pr->hydraul.NodeHead   = (double *)calloc(n, sizeof(double));
-        pr->quality.NodeQual   = (double *)calloc(n, sizeof(double));
+        pr->network.Node            = (Snode *)calloc(n, sizeof(Snode));
+        pr->hydraul.NodeDemand      = (double *)calloc(n, sizeof(double));
+        pr->hydraul.NodeHead        = (double *)calloc(n, sizeof(double));
+        pr->quality.NodeQual        = (double *)calloc(n, sizeof(double));
+        pr->quality.NodeInitialQual = (double *)calloc(n, sizeof(double));
         ERRCODE(MEMCHECK(pr->network.Node));
         ERRCODE(MEMCHECK(pr->hydraul.NodeDemand));
         ERRCODE(MEMCHECK(pr->hydraul.NodeHead));
         ERRCODE(MEMCHECK(pr->quality.NodeQual));
+        ERRCODE(MEMCHECK(pr->quality.NodeInitialQual));
     }
 
     // Allocate memory for network links

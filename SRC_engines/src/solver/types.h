@@ -48,11 +48,13 @@ typedef  int          INT4;
 #define   BIG       1.E10
 #define   TINY      1.E-6
 #define   MISSING   -1.E10     // Missing value indicator
-#define   DIFFUS    1.3E-8     // Diffusivity of chlorine
+#define   DIFFUS    150.64E-8  // Diffusivity of water
                                // @ 20 deg C (sq ft/sec)
 #define   VISCOS    1.1E-5     // Kinematic viscosity of water
                                // @ 20 deg C (sq ft/sec)
 #define   MINPDIFF  0.1        // PDA min. pressure difference (psi or m)
+#define   CAPARO    42E5       // Rho*Cp of water
+                               // SI                 
 #define   SEPSTR    " \t\n\r"  // Token separator characters
 #ifdef M_PI
   #define   PI        M_PI
@@ -791,6 +793,7 @@ typedef struct {
     Climit,                // Limiting potential quality
     SourceQual,            // External source quality
     *NodeQual,             // Reported node quality state
+    *NodeInitialQual,      // Node initial quality state
     *PipeRateCoeff;        // Pipe reaction rate coeffs.
 
   struct Mempool

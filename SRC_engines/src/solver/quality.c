@@ -129,6 +129,8 @@ int initqual(Project *pr)
         if (qual->Qualflag == TRACE) qual->NodeQual[i] = 0.0;
         else                         qual->NodeQual[i] = net->Node[i].C0;
         if (net->Node[i].S != NULL) net->Node[i].S->Smass = 0.0;
+
+        qual->NodeInitialQual[i] = qual->NodeQual[i];
     }
     if (qual->Qualflag == NONE) return errcode;
 

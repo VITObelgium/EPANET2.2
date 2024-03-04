@@ -243,13 +243,18 @@ double piperate(Project *pr, int k)
     if (Re < 1.0) Sh = 2.0;
 
     // Compute Sherwood No. for turbulent flow using the Notter-Sleicher formula.
-    else if (Re >= 2300.0) Sh = 0.0149 * pow(Re, 0.88) * pow(qual->Sc, 0.333);
+    else if (Re >= 2300.0) {
+        //Sh = 0.0149 * pow(Re, 0.88) * pow(qual->Sc, 0.333);
+        Sh = 0.021*pow(Re,0.8)*pow(qual->Sc, 0.43);
+    }
 
     // Compute Sherwood No. for laminar flow using Graetz solution formula.
     else
     {
         y = d / net->Link[k].Len * Re * qual->Sc;
         Sh = 3.65 + 0.0668 * y / (1.0 + 0.04 * pow(y, 0.667));
+        /* Relation that can be used for non established flow
+	    Sh=1.6*pow(y,0.333); */
     }
 
     // Compute mass transfer coeff. (in ft/sec)
@@ -264,6 +269,20 @@ double piperate(Project *pr, int k)
     return kw;
 }
 
+static double avgqual2(Project *pr, int k)
+/*
+**--------------------------------------------------------------
+**   Input:   k = link index
+**   Output:  returns WQ value
+**   Purpose: computes average quality in link k                      
+**--------------------------------------------------------------
+*/
+{
+    Network  *net = &pr->network;
+    Quality  *qual = &pr->quality;
+
+    return((qual->NodeInitialQual[net->Link[k].N1] + qual->NodeInitialQual[net->Link[k].N2])/2.);
+}
 
 double pipereact(Project *pr, int k, double c, double v, long dt)
 /*
@@ -281,7 +300,10 @@ double pipereact(Project *pr, int k, double c, double v, long dt)
     Network  *net = &pr->network;
     Quality  *qual = &pr->quality;
 
-    double cnew, dc, dcbulk, dcwall, rbulk, rwall;
+    double cnew, dc, dcbulk, dcwall, rbulk;
+
+    dcwall=0.0;
+    double cwall=((REAL4)(avgqual2(pr, k)));
 
     // For water age (hrs), update concentration by timestep
     if (qual->Qualflag == AGE)
@@ -293,12 +315,26 @@ double pipereact(Project *pr, int k, double c, double v, long dt)
     }
 
     // Otherwise find bulk & wall reaction rates
-    rbulk = bulkrate(pr, c, net->Link[k].Kb, qual->BulkOrder) * qual->Bucf;
-    rwall = wallrate(pr, c, net->Link[k].Diam, net->Link[k].Kw, net->Link[k].Rc);
+    /*Modifs V. Harcouet 26-08-2011*/
+    double c1 = max(0.0, fabs(cwall-c));
+	double c2= cwall-c;
+
+	/* Compute concentration potential */
+    double c3 = c1 * c;
+  
+    /* Reaction rate = bulk coeff. * potential) */
+
+    if (c3 < 0) c3 = 0;
+    /*Modifs V. Harcouet 26-08-2011*/
+    if (c2>0) rbulk=(net->Link[k].Kb*c3)*qual->Bucf;
+   
+   
+    if (c2<=0) rbulk=(-net->Link[k].Kb*c3)*qual->Bucf;
+   
+    dcwall = 0.0;
 
     // Find change in concentration over timestep
     dcbulk = rbulk * (double)dt;
-    dcwall = rwall * (double)dt;
 
     // Update cumulative mass reacted
     if (pr->times.Htime >= pr->times.Rstart)
@@ -370,7 +406,7 @@ double bulkrate(Project *pr, double c, double kb, double order)
 {
     Quality *qual = &pr->quality;
 
-    double c1;
+    double c1, c2;
 
     // Find bulk reaction potential taking into account
     // limiting potential & reaction order.
@@ -391,7 +427,8 @@ double bulkrate(Project *pr, double c, double kb, double order)
     {
         // Account for limiting potential
         if (qual->Climit == 0.0) c1 = c;
-        else c1 = MAX(0.0, SGN(kb) * (qual->Climit - c));
+        else c1 = MAX(0.0, ABS(qual->Climit-c));
+		c2=(qual->Climit-c);
 
         // Compute concentration potential
         if (order == 1.0) c = c1;
@@ -401,7 +438,8 @@ double bulkrate(Project *pr, double c, double kb, double order)
 
     // Reaction rate = bulk coeff. * potential
     if (c < 0) c = 0;
-    return kb * c;
+    if (c2>0) return (kb*c);
+    else return (-kb*c);
 }
 
 
@@ -425,12 +463,9 @@ double wallrate(Project *pr, double c, double d, double kw, double kf)
 
     if (qual->WallOrder == 0.0)             // 0-order reaction */
     {
-        kf = SGN(kw) * c * kf;              //* Mass transfer rate (mass/ft2/sec)
-        kw = kw * SQR(pr->Ucf[ELEV]);       // Reaction rate (mass/ft2/sec)
-        if (fabs(kf) < fabs(kw)) kw = kf;   // Reaction mass transfer limited
-        return (kw * 4.0 / d);              // Reaction rate (mass/ft3/sec)
+        return((kf*MperFT*CAPARO));        /* Reaction rate (mass/ft3/sec) */
     }
-    else return (c * kf);                   // 1st-order reaction
+    else return(kf * c);                   // 1st-order reaction
 }
 
 
