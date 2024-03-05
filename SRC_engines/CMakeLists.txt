@@ -9,7 +9,9 @@
 #
 
 
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.21)
+
+option(DYNAMIC_RUNTIME "Use the dynamic runtime libraries on windows" OFF)
 
 if("${CMAKE_BINARY_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
     message(FATAL_ERROR "In-source builds are disabled.")
@@ -21,8 +23,9 @@ project(
     DESCRIPTION "The EPANET Program for Water Distribution System Analysis"
 )
 
-set (LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
-set (EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>$<$<BOOL:${DYNAMIC_RUNTIME}>:DLL>")
 
 add_compile_definitions(
     $<$<CXX_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>
