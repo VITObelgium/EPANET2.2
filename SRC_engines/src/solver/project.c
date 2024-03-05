@@ -391,6 +391,7 @@ void freedata(Project *pr)
     free(pr->hydraul.LinkSetting);
     free(pr->hydraul.LinkStatus);
     free(pr->quality.NodeQual);
+    free(pr->quality.NodeInitialQual);
 
     // Free memory used for nodal adjacency lists
     freeadjlists(&pr->network);
