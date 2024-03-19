@@ -581,7 +581,8 @@ int linkoutput(Project *pr, int j, REAL4 *x, double ucf)
         }
         else for (i = 1; i <= net->Nlinks; i++)
         {
-            x[i] = (REAL4)(qual->PipeRateCoeff[i] * ucf);
+            //x[i] = (REAL4)(qual->PipeRateCoeff[i] * ucf);
+            x[i] = (REAL4)(qual->PipeRateCoeff[i]);
         }
         break;
 

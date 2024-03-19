@@ -65,7 +65,7 @@ void transport(Project *pr, long tstep)
     Padjlist  alink;
 
     // React contents of each pipe and tank
-    if (qual->Reactflag)
+    if (qual->Reactflag && pr->times.Htime > 0)
     {
         reactpipes(pr, tstep);
         reacttanks(pr, tstep);
